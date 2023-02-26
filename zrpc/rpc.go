@@ -12,6 +12,7 @@ import (
 	"github.com/chenquan/zero-flow/zrpc/internal/serverinterceptors"
 
 	"github.com/chenquan/zero-flow/zrpc/internal/discover"
+	_ "github.com/chenquan/zero-flow/zrpc/internal/resolver"
 	"github.com/zeromicro/go-zero/core/discov"
 	"github.com/zeromicro/go-zero/zrpc"
 	"google.golang.org/grpc"
