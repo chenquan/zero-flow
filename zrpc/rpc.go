@@ -20,12 +20,12 @@ import (
 
 type RpcClientConf struct {
 	zrpc.RpcClientConf
-	Metadata string `json:",optional" env:","`
+	Metadata string `json:",optional,env=FLOW_METADATA"`
 }
 
 type RpcServerConf struct {
 	zrpc.RpcServerConf
-	Metadata string `json:",optional" env:","`
+	Metadata string `json:",optional,env=FLOW_METADATA"`
 }
 
 func MustNewClient(c RpcClientConf, options ...zrpc.ClientOption) zrpc.Client {
