@@ -1,10 +1,11 @@
-package selector
+package internal
 
 import (
 	"sort"
 	"strings"
 
 	"github.com/chenquan/zero-flow/md"
+	"github.com/chenquan/zero-flow/selector"
 	"github.com/zeromicro/go-zero/core/logx"
 	"go.opentelemetry.io/otel/trace"
 	"google.golang.org/grpc/balancer"
@@ -14,17 +15,16 @@ const DefaultSelector = "defaultSelector"
 const colorKey = "color"
 
 var (
-	_                 Selector = (*defaultSelector)(nil)
-	DefaultSelectorMd          = NewSelectorMetadata(DefaultSelector)
+	_ selector.Selector = (*defaultSelector)(nil)
 )
 
 func init() {
-	Register(defaultSelector{})
+	selector.Register(defaultSelector{})
 }
 
 type defaultSelector struct{}
 
-func (d defaultSelector) Select(conns []Conn, info balancer.PickInfo) []Conn {
+func (d defaultSelector) Select(conns []selector.Conn, info balancer.PickInfo) []selector.Conn {
 	m, ok := md.FromContext(info.Ctx)
 	if !ok {
 		return d.getNoColorConns(conns)
@@ -35,7 +35,7 @@ func (d defaultSelector) Select(conns []Conn, info balancer.PickInfo) []Conn {
 		return d.getNoColorConns(conns)
 	}
 
-	newConns := make([]Conn, 0, len(conns))
+	newConns := make([]selector.Conn, 0, len(conns))
 	sort.Strings(clientColors)
 	for i := len(clientColors) - 1; i >= 0; i-- {
 		clientColor := clientColors[i]
@@ -57,7 +57,7 @@ func (d defaultSelector) Select(conns []Conn, info balancer.PickInfo) []Conn {
 
 		if len(newConns) != 0 {
 			spanCtx := trace.SpanFromContext(info.Ctx)
-			spanCtx.SetAttributes(ColorAttributeKey.String(clientColor))
+			spanCtx.SetAttributes(selector.ColorAttributeKey.String(clientColor))
 			logx.WithContext(info.Ctx).Debugw("flow dyeing", logx.Field(colorKey, clientColor), logx.Field("candidateColors", "["+strings.Join(clientColors, ", ")+"]"))
 
 			break
@@ -71,8 +71,8 @@ func (d defaultSelector) Name() string {
 	return DefaultSelector
 }
 
-func (d defaultSelector) getNoColorConns(conns []Conn) []Conn {
-	var newConns []Conn
+func (d defaultSelector) getNoColorConns(conns []selector.Conn) []selector.Conn {
+	var newConns []selector.Conn
 	for _, conn := range conns {
 		metadataFromGrpcAttributes := conn.Metadata()
 		colors := metadataFromGrpcAttributes.Get(colorKey)
