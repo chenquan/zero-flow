@@ -1,7 +1,7 @@
 package rest
 
 import (
-	"github.com/chenquan/zero-flow/rest/handler"
+	"github.com/chenquan/zero-flow/rest/internal/handler"
 	"github.com/zeromicro/go-zero/rest"
 )
 
