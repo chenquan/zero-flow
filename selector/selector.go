@@ -4,7 +4,6 @@ import (
 	"context"
 
 	"github.com/chenquan/zero-flow/md"
-	"github.com/chenquan/zero-flow/selector/internal"
 	"go.opentelemetry.io/otel/attribute"
 	"google.golang.org/grpc/balancer"
 	"google.golang.org/grpc/resolver"
@@ -13,9 +12,9 @@ import (
 const trafficSelect = "trafficselect"
 
 var (
-	DefaultSelectorMd = NewSelectorMetadata(internal.DefaultSelector)
+	DefaultSelectorMd = NewSelectorMetadata(DefaultSelector)
 	selectorMap       = make(map[string]Selector)
-	ColorAttributeKey = attribute.Key("selector.color")
+	colorAttributeKey = attribute.Key("selector.color")
 )
 
 type (
