@@ -1,11 +1,10 @@
-package internal
+package selector
 
 import (
 	"sort"
 	"strings"
 
 	"github.com/chenquan/zero-flow/md"
-	"github.com/chenquan/zero-flow/selector"
 	"github.com/zeromicro/go-zero/core/logx"
 	"go.opentelemetry.io/otel/trace"
 	"google.golang.org/grpc/balancer"
@@ -15,16 +14,16 @@ const DefaultSelector = "defaultSelector"
 const colorKey = "color"
 
 var (
-	_ selector.Selector = (*defaultSelector)(nil)
+	_ Selector = (*defaultSelector)(nil)
 )
 
 func init() {
-	selector.Register(defaultSelector{})
+	Register(defaultSelector{})
 }
 
 type defaultSelector struct{}
 
-func (d defaultSelector) Select(conns []selector.Conn, info balancer.PickInfo) []selector.Conn {
+func (d defaultSelector) Select(conns []Conn, info balancer.PickInfo) []Conn {
 	m, ok := md.FromContext(info.Ctx)
 	if !ok {
 		return d.getNoColorConns(conns)
@@ -35,7 +34,7 @@ func (d defaultSelector) Select(conns []selector.Conn, info balancer.PickInfo) [
 		return d.getNoColorConns(conns)
 	}
 
-	newConns := make([]selector.Conn, 0, len(conns))
+	newConns := make([]Conn, 0, len(conns))
 	sort.Strings(clientColors)
 	for i := len(clientColors) - 1; i >= 0; i-- {
 		clientColor := clientColors[i]
@@ -57,7 +56,7 @@ func (d defaultSelector) Select(conns []selector.Conn, info balancer.PickInfo) [
 
 		if len(newConns) != 0 {
 			spanCtx := trace.SpanFromContext(info.Ctx)
-			spanCtx.SetAttributes(selector.ColorAttributeKey.String(clientColor))
+			spanCtx.SetAttributes(colorAttributeKey.String(clientColor))
 			logx.WithContext(info.Ctx).Debugw("flow dyeing", logx.Field(colorKey, clientColor), logx.Field("candidateColors", "["+strings.Join(clientColors, ", ")+"]"))
 
 			break
@@ -71,8 +70,8 @@ func (d defaultSelector) Name() string {
 	return DefaultSelector
 }
 
-func (d defaultSelector) getNoColorConns(conns []selector.Conn) []selector.Conn {
-	var newConns []selector.Conn
+func (d defaultSelector) getNoColorConns(conns []Conn) []Conn {
+	var newConns []Conn
 	for _, conn := range conns {
 		metadataFromGrpcAttributes := conn.Metadata()
 		colors := metadataFromGrpcAttributes.Get(colorKey)
