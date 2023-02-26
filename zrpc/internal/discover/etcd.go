@@ -19,7 +19,7 @@ const (
 
 type EtcdConf struct {
 	discov.EtcdConf
-	Metadata string `json:",metadata,optional" env:","`
+	Metadata string
 }
 
 func (c EtcdConf) HasMetadata() bool {
