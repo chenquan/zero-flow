@@ -32,6 +32,7 @@ func (h GrpcMetadataCarrier) Set(key string, value ...string) {
 func (h GrpcMetadataCarrier) Keys() []string {
 	keys := make([]string, 0, len(h))
 	for k := range h {
+		k = strings.ToLower(k)
 		keys = append(keys, k)
 	}
 
