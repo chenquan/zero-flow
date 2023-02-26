@@ -9,7 +9,7 @@ import (
 	"google.golang.org/grpc/resolver"
 )
 
-const trafficSelect = "trafficselect"
+const trafficSelect = "traffic-select"
 
 var (
 	DefaultSelectorMd = NewSelectorMetadata(DefaultSelector)

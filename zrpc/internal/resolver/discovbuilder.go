@@ -4,11 +4,10 @@ import (
 	"net/url"
 	"strings"
 
+	"github.com/chenquan/zero-flow/md"
 	"github.com/chenquan/zero-flow/zrpc/internal/targets"
 	"github.com/zeromicro/go-zero/core/discov"
 	"github.com/zeromicro/go-zero/core/logx"
-	"google.golang.org/grpc/attributes"
-
 	"google.golang.org/grpc/resolver"
 )
 
@@ -71,7 +70,7 @@ func parserAddr(sub *discov.Subscriber) ([]resolver.Address, error) {
 			continue
 		}
 
-		attr := attributes.New("metadata", u.Query())
+		attr := md.NewAttributes(u.Query())
 		addr := u.Host
 
 		addrs = append(addrs, resolver.Address{

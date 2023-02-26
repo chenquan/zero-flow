@@ -129,8 +129,20 @@ func NewMetaDataFromContext(ctx context.Context, carrier Carrier) (context.Conte
 	return context.WithValue(ctx, metadataKey{}, metadata), metadata
 }
 
+func copyOf(v []string) []string {
+	vals := make([]string, len(v))
+	copy(vals, v)
+	return vals
+}
+
+type metadataAttributesKey struct{}
+
+func NewAttributes(v any) *attributes.Attributes {
+	return attributes.New(metadataAttributesKey{}, v)
+}
+
 func FromGrpcAttributes(attributes *attributes.Attributes) (Metadata, bool) {
-	value := attributes.Value("metadata")
+	value := attributes.Value(metadataAttributesKey{})
 	if value == nil {
 		return nil, false
 	}
@@ -140,16 +152,5 @@ func FromGrpcAttributes(attributes *attributes.Attributes) (Metadata, bool) {
 		return nil, false
 	}
 
-	md := make(Metadata, len(m))
-	for k, v := range m {
-		md[k] = v
-	}
-
-	return md, true
-}
-
-func copyOf(v []string) []string {
-	vals := make([]string, len(v))
-	copy(vals, v)
-	return vals
+	return Metadata(m).Clone(), true
 }
