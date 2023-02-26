@@ -27,7 +27,7 @@ func (m Metadata) Append(key string, values ...string) {
 func (m Metadata) Keys() []string {
 	keys := make([]string, 0, len(m))
 	for k := range m {
-		keys = append(keys, k)
+		keys = append(keys, strings.ToLower(k))
 	}
 
 	return keys
@@ -61,6 +61,7 @@ func (m Metadata) String() string {
 	builder := strings.Builder{}
 	builder.WriteRune('{')
 	for k, values := range m {
+		k = strings.ToLower(k)
 		builder.WriteString(k)
 		builder.WriteRune('=')
 		builder.WriteRune('[')
@@ -81,14 +82,16 @@ func (m Metadata) String() string {
 func (m Metadata) Clone() Metadata {
 	metadata := make(Metadata, len(m))
 	for k, v := range m {
+		k = strings.ToLower(k)
 		metadata[k] = copyOf(v)
 	}
+
 	return metadata
 }
 
 func (m Metadata) Merge(metadata Metadata) {
 	metadata.Range(func(key string, values ...string) bool {
-		m.Append(key, copyOf(values)...)
+		m.Append(strings.ToLower(key), copyOf(values)...)
 		return true
 	})
 }
@@ -99,13 +102,13 @@ func FromContext(ctx context.Context) (Metadata, bool) {
 		return nil, false
 	}
 
-	return value.(Metadata), true
+	return value.(Metadata).Clone(), true
 }
 
 func NewContext(ctx context.Context, carrier Carrier) context.Context {
 	md := Metadata{}
 	for _, k := range carrier.Keys() {
-		md[k] = carrier.Get(k)
+		md[strings.ToLower(k)] = carrier.Get(k)
 	}
 
 	return context.WithValue(ctx, metadataKey{}, md)
@@ -120,8 +123,7 @@ func NewMetaDataFromContext(ctx context.Context, carrier Carrier) (context.Conte
 	}
 
 	for _, key := range carrier.Keys() {
-		key := strings.ToLower(key)
-		metadata.Append(key, carrier.Get(key)...)
+		metadata.Append(strings.ToLower(key), carrier.Get(key)...)
 	}
 
 	return context.WithValue(ctx, metadataKey{}, metadata), metadata
