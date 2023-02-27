@@ -7,6 +7,7 @@ import (
 
 	"github.com/chenquan/zero-flow/internal/xstrings"
 	"google.golang.org/grpc/attributes"
+	"google.golang.org/grpc/metadata"
 )
 
 var _ Carrier = (*Metadata)(nil)
@@ -121,6 +122,17 @@ func NewContext(ctx context.Context, carrier Carrier) context.Context {
 	return context.WithValue(ctx, metadataKey{}, md)
 }
 
+func ToGrpcMetadata(m Metadata) metadata.MD {
+	md := metadata.MD{}
+	keys := m.Keys()
+	for _, key := range keys {
+		md.Set(key, m.Get(key)...)
+	}
+	m.Set(zeroFlowFieldsKey, keys...)
+
+	return md
+}
+
 func NewMetaDataFromContext(ctx context.Context, carrier Carrier) (context.Context, Metadata) {
 	metadata, ok := FromContext(ctx)
 	if !ok {
@@ -128,12 +140,11 @@ func NewMetaDataFromContext(ctx context.Context, carrier Carrier) (context.Conte
 	} else {
 		metadata = metadata.Clone()
 	}
-
-	for _, key := range carrier.Keys() {
+	keys := carrier.Keys()
+	for _, key := range keys {
 		metadata.Append(strings.ToLower(key), xstrings.Distinct(carrier.Get(key))...)
 	}
 	metadata.Distinct()
-
 	return context.WithValue(ctx, metadataKey{}, metadata), metadata
 }
 

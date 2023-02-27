@@ -3,7 +3,6 @@ package clientinterceptors
 import (
 	"context"
 
-	"github.com/chenquan/zero-flow/internal/xstrings"
 	"github.com/chenquan/zero-flow/md"
 	"github.com/zeromicro/go-zero/core/logx"
 	"google.golang.org/grpc"
@@ -31,15 +30,11 @@ func injectionMd(ctx context.Context, defaultMd md.Metadata) context.Context {
 	if !ok {
 		outgoingMd = metadata.MD{}
 	}
-	var zeroFlowFields []string
-	m.Range(func(key string, values ...string) bool {
-		zeroFlowFields = append(zeroFlowFields, key)
-		outgoingMd.Append(key, xstrings.Distinct(values)...)
-		return true
-	})
 
-	outgoingMd.Set("zero-flow-fields", zeroFlowFields...)
-
+	grpcMetadata := md.ToGrpcMetadata(m)
+	for key, values := range grpcMetadata {
+		outgoingMd.Append(key, values...)
+	}
 	ctx = metadata.NewOutgoingContext(ctx, outgoingMd)
 
 	m, ok = md.FromContext(ctx)
