@@ -5,6 +5,7 @@ import (
 	"net/url"
 	"strings"
 
+	"github.com/chenquan/zero-flow/internal/xstrings"
 	"google.golang.org/grpc/attributes"
 )
 
@@ -91,9 +92,15 @@ func (m Metadata) Clone() Metadata {
 
 func (m Metadata) Merge(metadata Metadata) {
 	metadata.Range(func(key string, values ...string) bool {
-		m.Append(strings.ToLower(key), copyOf(values)...)
+		m.Append(strings.ToLower(key), copyOf(xstrings.Distinct(values))...)
 		return true
 	})
+}
+
+func (m Metadata) Distinct() {
+	for k, v := range m {
+		m[k] = xstrings.Distinct(v)
+	}
 }
 
 func FromContext(ctx context.Context) (Metadata, bool) {
@@ -123,8 +130,9 @@ func NewMetaDataFromContext(ctx context.Context, carrier Carrier) (context.Conte
 	}
 
 	for _, key := range carrier.Keys() {
-		metadata.Append(strings.ToLower(key), carrier.Get(key)...)
+		metadata.Append(strings.ToLower(key), xstrings.Distinct(carrier.Get(key))...)
 	}
+	metadata.Distinct()
 
 	return context.WithValue(ctx, metadataKey{}, metadata), metadata
 }

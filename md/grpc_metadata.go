@@ -6,6 +6,8 @@ import (
 	"google.golang.org/grpc/metadata"
 )
 
+const zeroFlowFieldsKey = "zero-flow-fields"
+
 var _ Carrier = (*GrpcMetadataCarrier)(nil)
 
 type GrpcMetadataCarrier metadata.MD
@@ -20,6 +22,7 @@ func (h GrpcMetadataCarrier) Append(key string, values ...string) {
 }
 
 func (h GrpcMetadataCarrier) Get(key string) []string {
+
 	key = strings.ToLower(key)
 	return h[key]
 }
@@ -30,11 +33,12 @@ func (h GrpcMetadataCarrier) Set(key string, value ...string) {
 }
 
 func (h GrpcMetadataCarrier) Keys() []string {
-	keys := make([]string, 0, len(h))
-	for k := range h {
-		k = strings.ToLower(k)
-		keys = append(keys, k)
-	}
+	//keys := make([]string, 0, len(h))
+	//for k := range h {
+	//	k = strings.ToLower(k)
+	//	keys = append(keys, k)
+	//}
+	//
 
-	return keys
+	return h["zero-flow-fields"]
 }
