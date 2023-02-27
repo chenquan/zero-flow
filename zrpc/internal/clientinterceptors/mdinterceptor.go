@@ -31,10 +31,10 @@ func injectionMd(ctx context.Context, defaultMd md.Metadata) context.Context {
 		outgoingMd = metadata.MD{}
 	}
 
-	m.Range(func(key string, values ...string) bool {
+	grpcMetadata := md.ToGrpcMetadata(m)
+	for key, values := range grpcMetadata {
 		outgoingMd.Append(key, values...)
-		return true
-	})
+	}
 	ctx = metadata.NewOutgoingContext(ctx, outgoingMd)
 
 	m, ok = md.FromContext(ctx)

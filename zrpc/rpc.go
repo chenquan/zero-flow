@@ -35,6 +35,7 @@ func MustNewClient(c RpcClientConf, options ...zrpc.ClientOption) zrpc.Client {
 	}
 	metadata := md.Metadata(query)
 	metadata.Merge(selector.DefaultSelectorMd)
+	metadata.Distinct()
 	svcCfg := fmt.Sprintf(`{"loadBalancingPolicy":"%s"}`, p2c.Name)
 	options = append(options,
 		zrpc.WithUnaryClientInterceptor(clientinterceptors.UnaryMdInterceptor(metadata.Clone())),

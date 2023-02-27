@@ -5,7 +5,9 @@ import (
 	"net/url"
 	"strings"
 
+	"github.com/chenquan/zero-flow/internal/xstrings"
 	"google.golang.org/grpc/attributes"
+	"google.golang.org/grpc/metadata"
 )
 
 var _ Carrier = (*Metadata)(nil)
@@ -91,9 +93,15 @@ func (m Metadata) Clone() Metadata {
 
 func (m Metadata) Merge(metadata Metadata) {
 	metadata.Range(func(key string, values ...string) bool {
-		m.Append(strings.ToLower(key), copyOf(values)...)
+		m.Append(strings.ToLower(key), copyOf(xstrings.Distinct(values))...)
 		return true
 	})
+}
+
+func (m Metadata) Distinct() {
+	for k, v := range m {
+		m[k] = xstrings.Distinct(v)
+	}
 }
 
 func FromContext(ctx context.Context) (Metadata, bool) {
@@ -114,6 +122,17 @@ func NewContext(ctx context.Context, carrier Carrier) context.Context {
 	return context.WithValue(ctx, metadataKey{}, md)
 }
 
+func ToGrpcMetadata(m Metadata) metadata.MD {
+	md := metadata.MD{}
+	keys := m.Keys()
+	for _, key := range keys {
+		md.Set(key, m.Get(key)...)
+	}
+	m.Set(zeroFlowFieldsKey, keys...)
+
+	return md
+}
+
 func NewMetaDataFromContext(ctx context.Context, carrier Carrier) (context.Context, Metadata) {
 	metadata, ok := FromContext(ctx)
 	if !ok {
@@ -121,11 +140,11 @@ func NewMetaDataFromContext(ctx context.Context, carrier Carrier) (context.Conte
 	} else {
 		metadata = metadata.Clone()
 	}
-
-	for _, key := range carrier.Keys() {
-		metadata.Append(strings.ToLower(key), carrier.Get(key)...)
+	keys := carrier.Keys()
+	for _, key := range keys {
+		metadata.Append(strings.ToLower(key), xstrings.Distinct(carrier.Get(key))...)
 	}
-
+	metadata.Distinct()
 	return context.WithValue(ctx, metadataKey{}, metadata), metadata
 }
 
