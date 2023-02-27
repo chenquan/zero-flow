@@ -20,6 +20,8 @@ import (
 
 type (
 	ClientOption  = zrpc.ClientOption
+	Client        = zrpc.Client
+	RpcServer     = zrpc.RpcServer
 	RpcClientConf struct {
 		zrpc.RpcClientConf
 		Metadata string `json:",optional,env=FLOW_METADATA"`
@@ -30,7 +32,7 @@ type (
 	}
 )
 
-func MustNewClient(c RpcClientConf, options ...ClientOption) zrpc.Client {
+func MustNewClient(c RpcClientConf, options ...ClientOption) Client {
 	query, err := url.ParseQuery(c.Metadata)
 	if err != nil {
 		log.Panicln(err)
@@ -47,7 +49,7 @@ func MustNewClient(c RpcClientConf, options ...ClientOption) zrpc.Client {
 	return zrpc.MustNewClient(c.RpcClientConf, options...)
 }
 
-func MustNewServer(c RpcServerConf, register func(*grpc.Server)) *zrpc.RpcServer {
+func MustNewServer(c RpcServerConf, register func(*grpc.Server)) *RpcServer {
 	etcdConf := c.Etcd
 	c.Etcd = discov.EtcdConf{}
 	server := zrpc.MustNewServer(c.RpcServerConf, func(server *grpc.Server) {
