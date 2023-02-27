@@ -10,12 +10,15 @@ import (
 	"github.com/zeromicro/go-zero/rest"
 )
 
-type RestConf struct {
-	rest.RestConf
-	Metadata string `json:",optional,env=FLOW_METADATA"`
-}
+type (
+	RunOption = rest.RunOption
+	RestConf  struct {
+		rest.RestConf
+		Metadata string `json:",optional,env=FLOW_METADATA"`
+	}
+)
 
-func MustNewServer(c RestConf, opts ...rest.RunOption) *rest.Server {
+func MustNewServer(c RestConf, opts ...RunOption) *rest.Server {
 	query, err := url.ParseQuery(c.Metadata)
 	if err != nil {
 		log.Panicln(err)

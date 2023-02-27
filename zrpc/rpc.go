@@ -18,17 +18,19 @@ import (
 	"google.golang.org/grpc"
 )
 
-type RpcClientConf struct {
-	zrpc.RpcClientConf
-	Metadata string `json:",optional,env=FLOW_METADATA"`
-}
+type (
+	ClientOption  = zrpc.ClientOption
+	RpcClientConf struct {
+		zrpc.RpcClientConf
+		Metadata string `json:",optional,env=FLOW_METADATA"`
+	}
+	RpcServerConf struct {
+		zrpc.RpcServerConf
+		Metadata string `json:",optional,env=FLOW_METADATA"`
+	}
+)
 
-type RpcServerConf struct {
-	zrpc.RpcServerConf
-	Metadata string `json:",optional,env=FLOW_METADATA"`
-}
-
-func MustNewClient(c RpcClientConf, options ...zrpc.ClientOption) zrpc.Client {
+func MustNewClient(c RpcClientConf, options ...ClientOption) zrpc.Client {
 	query, err := url.ParseQuery(c.Metadata)
 	if err != nil {
 		log.Panicln(err)
