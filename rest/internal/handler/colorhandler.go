@@ -1,29 +1,35 @@
 package handler
 
 import (
+	"context"
 	"net/http"
 
-	"github.com/chenquan/zero-flow/md"
+	"github.com/chenquan/zero-flow/tag"
 	"go.opentelemetry.io/otel/attribute"
 	"go.opentelemetry.io/otel/trace"
 )
 
 var httpColorAttributeKey = attribute.Key("http.header.color")
 
-func ColorHandler(defaultMd md.Metadata) func(next http.Handler) http.Handler {
+func ColorHandler(headerTag string) func(next http.Handler) http.Handler {
 	return func(next http.Handler) http.Handler {
 		return http.HandlerFunc(func(writer http.ResponseWriter, request *http.Request) {
 			ctx := request.Context()
-			ctx, _ = md.NewMetaDataFromContext(ctx, defaultMd)
-
-			colors := request.Header.Values("color")
-			if len(colors) != 0 {
-				ctx, _ = md.NewMetaDataFromContext(ctx, md.Metadata{"color": colors})
-			}
-
-			span := trace.SpanFromContext(ctx)
-			span.SetAttributes(httpColorAttributeKey.StringSlice(colors))
+			ctx = newBaggage(ctx, request, headerTag)
 			next.ServeHTTP(writer, request.WithContext(ctx))
 		})
 	}
+}
+
+func newBaggage(ctx context.Context, request *http.Request, headerTag string) context.Context {
+	span := trace.SpanFromContext(ctx)
+	tagString := request.Header.Get(headerTag)
+	if len(tagString) == 0 {
+		return ctx
+	}
+
+	ctx = tag.ContextWithTag(ctx, tagString)
+	span.SetAttributes(httpColorAttributeKey.String(tagString))
+
+	return ctx
 }

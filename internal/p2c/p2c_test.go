@@ -128,6 +128,11 @@ type mockClientConn struct {
 	id string
 }
 
+func (m mockClientConn) GetOrBuildProducer(builder balancer.ProducerBuilder) (p balancer.Producer, close func()) {
+	//TODO implement me
+	panic("implement me")
+}
+
 func (m mockClientConn) UpdateAddresses(addresses []resolver.Address) {
 }
 

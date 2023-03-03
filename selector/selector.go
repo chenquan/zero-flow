@@ -1,9 +1,6 @@
 package selector
 
 import (
-	"context"
-
-	"github.com/chenquan/zero-flow/md"
 	"go.opentelemetry.io/otel/attribute"
 	"google.golang.org/grpc/balancer"
 	"google.golang.org/grpc/resolver"
@@ -12,7 +9,6 @@ import (
 const trafficSelect = "traffic-select"
 
 var (
-	DefaultSelectorMd = NewSelectorMetadata(DefaultSelector)
 	selectorMap       = make(map[string]Selector)
 	colorAttributeKey = attribute.Key("selector.color")
 )
@@ -25,7 +21,7 @@ type (
 	Conn interface {
 		Address() resolver.Address
 		SubConn() balancer.SubConn
-		Metadata() md.Metadata
+		Tag() string
 	}
 )
 
@@ -38,58 +34,4 @@ func Get(name string) Selector {
 		return b
 	}
 	return nil
-}
-
-func SelectFromContext(ctx context.Context) []Selector {
-	m, b := md.FromContext(ctx)
-	if !b {
-		return nil
-	}
-
-	selectorNames := m.Get(trafficSelect)
-	if len(selectorNames) == 0 {
-		return nil
-	}
-
-	selectors := make([]Selector, 0, len(selectorNames))
-	for _, selectorName := range selectorNames {
-		selector := Get(selectorName)
-		if selector == nil {
-			continue
-		}
-
-		selectors = append(selectors, selector)
-	}
-
-	return selectors
-}
-
-func NewSelectorContext(ctx context.Context, selectorName string) context.Context {
-	m, b := md.FromContext(ctx)
-	if !b {
-		m = md.Metadata{}
-	}
-
-	m.Set(trafficSelect, selectorName)
-
-	return md.NewContext(ctx, m)
-}
-
-func AppendSelectorContext(ctx context.Context, selectorName string) context.Context {
-	m, b := md.FromContext(ctx)
-	if !b {
-		m = md.Metadata{}
-	} else {
-		m = m.Clone()
-	}
-
-	m.Append(trafficSelect, selectorName)
-
-	return md.NewContext(ctx, m)
-}
-
-func NewSelectorMetadata(selectorName string) md.Metadata {
-	m := md.Metadata{}
-	m.Set(trafficSelect, selectorName)
-	return m
 }

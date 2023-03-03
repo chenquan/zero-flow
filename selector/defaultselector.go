@@ -1,20 +1,17 @@
 package selector
 
 import (
-	"sort"
-	"strings"
-
-	"github.com/chenquan/zero-flow/md"
+	"github.com/chenquan/zero-flow/tag"
 	"github.com/zeromicro/go-zero/core/logx"
 	"go.opentelemetry.io/otel/trace"
 	"google.golang.org/grpc/balancer"
 )
 
-const DefaultSelector = "defaultSelector"
-const colorKey = "color"
+const tagKey = "tag"
 
 var (
-	_ Selector = (*defaultSelector)(nil)
+	DefaultSelector          = defaultSelector{}
+	_               Selector = (*defaultSelector)(nil)
 )
 
 func init() {
@@ -24,58 +21,41 @@ func init() {
 type defaultSelector struct{}
 
 func (d defaultSelector) Select(conns []Conn, info balancer.PickInfo) []Conn {
-	m, ok := md.FromContext(info.Ctx)
-	if !ok {
-		return d.getNoColorConns(conns)
-	}
-
-	clientColors := m.Get(colorKey)
-	if len(clientColors) == 0 {
+	tag := tag.FromContext(info.Ctx)
+	if len(tag) == 0 {
 		return d.getNoColorConns(conns)
 	}
 
 	newConns := make([]Conn, 0, len(conns))
-	sort.Strings(clientColors)
-	for i := len(clientColors) - 1; i >= 0; i-- {
-		clientColor := clientColors[i]
-		for _, conn := range conns {
-			metadataFromGrpcAttributes := conn.Metadata()
-			colors := metadataFromGrpcAttributes.Get(colorKey)
-
-			if len(colors) == 0 {
-				newConns = append(newConns, conn)
-				continue
-			}
-
-			for _, color := range colors {
-				if clientColor == color {
-					newConns = append(newConns, conn)
-				}
-			}
+	for _, conn := range conns {
+		if len(conn.Tag()) == 0 {
+			newConns = append(newConns, conn)
+			continue
 		}
 
-		if len(newConns) != 0 {
-			spanCtx := trace.SpanFromContext(info.Ctx)
-			spanCtx.SetAttributes(colorAttributeKey.String(clientColor))
-			logx.WithContext(info.Ctx).Debugw("flow dyeing", logx.Field(colorKey, clientColor), logx.Field("candidateColors", "["+strings.Join(clientColors, ", ")+"]"))
-
-			break
+		if tag == conn.Tag() {
+			newConns = append(newConns, conn)
 		}
+	}
+
+	if len(newConns) != 0 {
+		spanCtx := trace.SpanFromContext(info.Ctx)
+		spanCtx.SetAttributes(colorAttributeKey.String(tag))
+		logx.WithContext(info.Ctx).Debugw("flow dyeing", logx.Field(tagKey, tag))
 	}
 
 	return newConns
 }
 
 func (d defaultSelector) Name() string {
-	return DefaultSelector
+	return "DefaultSelector"
 }
 
 func (d defaultSelector) getNoColorConns(conns []Conn) []Conn {
 	var newConns []Conn
 	for _, conn := range conns {
-		metadataFromGrpcAttributes := conn.Metadata()
-		colors := metadataFromGrpcAttributes.Get(colorKey)
-		if len(colors) == 0 {
+		tag := conn.Tag()
+		if len(tag) == 0 {
 			newConns = append(newConns, conn)
 		}
 	}

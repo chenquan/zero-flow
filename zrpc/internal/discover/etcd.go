@@ -2,7 +2,6 @@ package discover
 
 import (
 	"fmt"
-	"net/url"
 	"os"
 	"strings"
 
@@ -35,17 +34,9 @@ func RegisterRpc(conf EtcdConf, ListenOn string) error {
 		pubOpts = append(pubOpts, discov.WithPubEtcdTLS(conf.CertFile, conf.CertKeyFile,
 			conf.CACertFile, conf.InsecureSkipVerify))
 	}
-	var metadata url.Values
-	if conf.HasMetadata() {
-		var err error
-		metadata, err = url.ParseQuery(conf.Metadata)
-		if err != nil {
-			return err
-		}
-	}
 
 	pubListenOn := figureOutListenOn(ListenOn)
-	value := fmt.Sprintf("%s?%s", pubListenOn, metadata.Encode())
+	value := fmt.Sprintf("%s?tag=%s", pubListenOn, conf.Metadata)
 	pubClient := discov.NewPublisher(conf.Hosts, conf.Key, value, pubOpts...)
 	proc.AddShutdownListener(func() {
 		pubClient.Stop()

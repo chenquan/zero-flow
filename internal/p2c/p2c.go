@@ -9,8 +9,8 @@ import (
 	"sync/atomic"
 	"time"
 
-	"github.com/chenquan/zero-flow/md"
 	"github.com/chenquan/zero-flow/selector"
+	"github.com/chenquan/zero-flow/tag"
 	"github.com/zeromicro/go-zero/core/logx"
 	"github.com/zeromicro/go-zero/core/syncx"
 	"github.com/zeromicro/go-zero/core/timex"
@@ -57,13 +57,12 @@ func (b *p2cPickerBuilder) Build(info base.PickerBuildInfo) balancer.Picker {
 	var conns []*subConn
 	for conn, connInfo := range readySCs {
 		addr := connInfo.Address
-		metadata, _ := md.FromGrpcAttributes(addr.BalancerAttributes)
-
+		tag, _ := tag.FromGrpcAttributes(addr.BalancerAttributes)
 		conns = append(conns, &subConn{
-			addr:     addr,
-			conn:     conn,
-			success:  initSuccess,
-			metadata: metadata,
+			addr:    addr,
+			conn:    conn,
+			success: initSuccess,
+			tag:     tag,
 		})
 	}
 
@@ -95,26 +94,11 @@ func (p *p2cPicker) Pick(info balancer.PickInfo) (balancer.PickResult, error) {
 		connsCp = append(connsCp, conn)
 	}
 
-	selectors := selector.SelectFromContext(info.Ctx)
-	for _, slc := range selectors {
-		selectedConns := slc.Select(connsCp, info)
-		if len(selectedConns) != 0 {
-			conns = selectedConns
-
-			spanCtx := trace.SpanFromContext(info.Ctx)
-			spanCtx.SetAttributes(selectorAttributeKey.String(slc.Name()))
-			selectorNames := make([]string, 0, len(selectors))
-			for _, s := range selectors {
-				selectorNames = append(selectorNames, s.Name())
-			}
-			logx.WithContext(info.Ctx).Debugw("flow dyeing", logx.Field("selector", slc.Name()), logx.Field("candidateSelectors", "["+strings.Join(selectorNames, ", ")+"]"))
-
-			break
-		}
-	}
-
-	if len(selectors) == 0 {
-		conns = connsCp
+	selectedConns := selector.DefaultSelector.Select(connsCp, info)
+	if len(selectedConns) != 0 {
+		conns = selectedConns
+		spanCtx := trace.SpanFromContext(info.Ctx)
+		spanCtx.SetAttributes(selectorAttributeKey.String(""))
 	}
 
 	var chosen *subConn
@@ -233,11 +217,11 @@ type subConn struct {
 	pick     int64
 	addr     resolver.Address
 	conn     balancer.SubConn
-	metadata md.Metadata
+	tag      string
 }
 
-func (c *subConn) Metadata() md.Metadata {
-	return c.metadata
+func (c *subConn) Tag() string {
+	return c.tag
 }
 
 func (c *subConn) Address() resolver.Address {
