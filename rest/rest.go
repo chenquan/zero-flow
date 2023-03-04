@@ -10,12 +10,12 @@ type (
 	Server    = rest.Server
 	RestConf  struct {
 		rest.RestConf
-		HeaderTag string `json:",optional"`
+		TagHeader string `json:",optional"`
 	}
 )
 
 func MustNewServer(c RestConf, opts ...RunOption) *Server {
 	server := rest.MustNewServer(c.RestConf, opts...)
-	server.Use(rest.ToMiddleware(handler.TagHandler(c.HeaderTag)))
+	server.Use(rest.ToMiddleware(handler.TagHandler(c.TagHeader)))
 	return server
 }

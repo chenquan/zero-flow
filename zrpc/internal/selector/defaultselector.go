@@ -1,13 +1,11 @@
 package selector
 
 import (
-	"github.com/chenquan/zero-flow/tag"
+	"github.com/chenquan/zero-flow/internal/tag"
 	"github.com/zeromicro/go-zero/core/logx"
 	"go.opentelemetry.io/otel/trace"
 	"google.golang.org/grpc/balancer"
 )
-
-const tagKey = "tag"
 
 var (
 	DefaultSelector          = defaultSelector{}
@@ -30,7 +28,7 @@ func (d defaultSelector) Select(conns []Conn, info balancer.PickInfo) []Conn {
 	}
 
 	if len(newConns) != 0 {
-		logx.WithContext(info.Ctx).Debugw("flow staining...", logx.Field(tagKey, tagString))
+		logx.WithContext(info.Ctx).Debugw("flow staining...", logx.Field(tag.Key, tagString))
 
 		spanCtx := trace.SpanFromContext(info.Ctx)
 		spanCtx.SetAttributes(tagAttributeKey.String(tagString))

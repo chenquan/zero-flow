@@ -9,7 +9,7 @@ import (
 	"sync/atomic"
 	"time"
 
-	"github.com/chenquan/zero-flow/tag"
+	"github.com/chenquan/zero-flow/internal/tag"
 	"github.com/chenquan/zero-flow/zrpc/internal/selector"
 	"github.com/zeromicro/go-zero/core/logx"
 	"github.com/zeromicro/go-zero/core/syncx"
