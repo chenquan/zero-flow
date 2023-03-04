@@ -18,11 +18,11 @@ const (
 
 type EtcdConf struct {
 	discov.EtcdConf
-	Metadata string
+	Tag string
 }
 
-func (c EtcdConf) HasMetadata() bool {
-	return c.Metadata != ""
+func (c EtcdConf) HasTag() bool {
+	return c.Tag != ""
 }
 
 func RegisterRpc(conf EtcdConf, ListenOn string) error {
@@ -35,8 +35,14 @@ func RegisterRpc(conf EtcdConf, ListenOn string) error {
 			conf.CACertFile, conf.InsecureSkipVerify))
 	}
 
+	var value string
 	pubListenOn := figureOutListenOn(ListenOn)
-	value := fmt.Sprintf("%s?tag=%s", pubListenOn, conf.Metadata)
+	if conf.HasTag() {
+		value = fmt.Sprintf("%s?tag=%s", pubListenOn, conf.Tag)
+	} else {
+		value = pubListenOn
+	}
+
 	pubClient := discov.NewPublisher(conf.Hosts, conf.Key, value, pubOpts...)
 	proc.AddShutdownListener(func() {
 		pubClient.Stop()

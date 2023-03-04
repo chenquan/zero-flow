@@ -20,7 +20,7 @@ type (
 	}
 	RpcServerConf struct {
 		zrpc.RpcServerConf
-		Metadata string `json:",optional,env=FLOW_METADATA"`
+		Tag string `json:",optional,env=ZERO_FLOW_TAG"`
 	}
 )
 
@@ -39,7 +39,7 @@ func MustNewServer(c RpcServerConf, register func(*grpc.Server)) *RpcServer {
 		register(server)
 		discover.MustRegisterRpc(discover.EtcdConf{
 			EtcdConf: etcdConf,
-			Metadata: c.Metadata,
+			Tag:      c.Tag,
 		}, c.RpcServerConf.ListenOn)
 	})
 
