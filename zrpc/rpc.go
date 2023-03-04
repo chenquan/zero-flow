@@ -3,8 +3,8 @@ package zrpc
 import (
 	"fmt"
 
-	"github.com/chenquan/zero-flow/internal/p2c"
 	"github.com/chenquan/zero-flow/zrpc/internal/discover"
+	"github.com/chenquan/zero-flow/zrpc/internal/p2c"
 	_ "github.com/chenquan/zero-flow/zrpc/internal/resolver"
 	"github.com/zeromicro/go-zero/core/discov"
 	"github.com/zeromicro/go-zero/zrpc"

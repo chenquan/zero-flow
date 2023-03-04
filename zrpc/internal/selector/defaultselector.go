@@ -14,15 +14,11 @@ var (
 	_               Selector = (*defaultSelector)(nil)
 )
 
-func init() {
-	Register(defaultSelector{})
-}
-
 type defaultSelector struct{}
 
 func (d defaultSelector) Select(conns []Conn, info balancer.PickInfo) []Conn {
-	tag := tag.FromContext(info.Ctx)
-	if len(tag) == 0 {
+	tagString := tag.FromContext(info.Ctx)
+	if len(tagString) == 0 {
 		return d.getNoColorConns(conns)
 	}
 
@@ -33,29 +29,24 @@ func (d defaultSelector) Select(conns []Conn, info balancer.PickInfo) []Conn {
 			continue
 		}
 
-		if tag == conn.Tag() {
+		if tagString == conn.Tag() {
 			newConns = append(newConns, conn)
 		}
 	}
 
 	if len(newConns) != 0 {
 		spanCtx := trace.SpanFromContext(info.Ctx)
-		spanCtx.SetAttributes(colorAttributeKey.String(tag))
-		logx.WithContext(info.Ctx).Debugw("flow dyeing", logx.Field(tagKey, tag))
+		spanCtx.SetAttributes(colorAttributeKey.String(tagString))
+		logx.WithContext(info.Ctx).Debugw("flow dyeing", logx.Field(tagKey, tagString))
 	}
 
 	return newConns
 }
 
-func (d defaultSelector) Name() string {
-	return "DefaultSelector"
-}
-
 func (d defaultSelector) getNoColorConns(conns []Conn) []Conn {
 	var newConns []Conn
 	for _, conn := range conns {
-		tag := conn.Tag()
-		if len(tag) == 0 {
+		if len(conn.Tag()) == 0 {
 			newConns = append(newConns, conn)
 		}
 	}

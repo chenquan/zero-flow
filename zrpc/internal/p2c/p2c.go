@@ -9,8 +9,8 @@ import (
 	"sync/atomic"
 	"time"
 
-	"github.com/chenquan/zero-flow/selector"
 	"github.com/chenquan/zero-flow/tag"
+	"github.com/chenquan/zero-flow/zrpc/internal/selector"
 	"github.com/zeromicro/go-zero/core/logx"
 	"github.com/zeromicro/go-zero/core/syncx"
 	"github.com/zeromicro/go-zero/core/timex"
@@ -57,12 +57,12 @@ func (b *p2cPickerBuilder) Build(info base.PickerBuildInfo) balancer.Picker {
 	var conns []*subConn
 	for conn, connInfo := range readySCs {
 		addr := connInfo.Address
-		tag, _ := tag.FromGrpcAttributes(addr.BalancerAttributes)
+		t, _ := tag.FromGrpcAttributes(addr.BalancerAttributes)
 		conns = append(conns, &subConn{
 			addr:    addr,
 			conn:    conn,
 			success: initSuccess,
-			tag:     tag,
+			tag:     t,
 		})
 	}
 

@@ -18,7 +18,12 @@ func ContextWithTag(ctx context.Context, tag string) context.Context {
 		return ctx
 	}
 
-	bg.SetMember(member)
+	bg, err = bg.SetMember(member)
+	if err != nil {
+		logx.WithContext(ctx).Error(err)
+		return ctx
+	}
+
 	ctx = baggage.ContextWithBaggage(ctx, bg)
 
 	return ctx
