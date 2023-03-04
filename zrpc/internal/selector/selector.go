@@ -6,9 +6,7 @@ import (
 	"google.golang.org/grpc/resolver"
 )
 
-var (
-	colorAttributeKey = attribute.Key("selector.tag")
-)
+var tagAttributeKey = attribute.Key("selector.tag")
 
 type (
 	Selector interface {

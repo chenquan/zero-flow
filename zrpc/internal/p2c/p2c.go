@@ -17,8 +17,6 @@ import (
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 
-	"go.opentelemetry.io/otel/attribute"
-	"go.opentelemetry.io/otel/trace"
 	"google.golang.org/grpc/balancer"
 	"google.golang.org/grpc/balancer/base"
 	"google.golang.org/grpc/resolver"
@@ -38,8 +36,7 @@ const (
 )
 
 var (
-	emptyPickResult      balancer.PickResult
-	selectorAttributeKey = attribute.Key("selector.name")
+	emptyPickResult balancer.PickResult
 )
 
 func init() {
@@ -88,18 +85,12 @@ func (p *p2cPicker) Pick(info balancer.PickInfo) (balancer.PickResult, error) {
 	p.lock.Lock()
 	defer p.lock.Unlock()
 
-	var conns []selector.Conn
-	connsCp := make([]selector.Conn, 0, len(conns))
+	connsCp := make([]selector.Conn, 0, len(p.conns))
 	for _, conn := range p.conns {
 		connsCp = append(connsCp, conn)
 	}
 
-	selectedConns := selector.DefaultSelector.Select(connsCp, info)
-	if len(selectedConns) != 0 {
-		conns = selectedConns
-		spanCtx := trace.SpanFromContext(info.Ctx)
-		spanCtx.SetAttributes(selectorAttributeKey.String(""))
-	}
+	conns := selector.DefaultSelector.Select(connsCp, info)
 
 	var chosen *subConn
 	switch len(conns) {
