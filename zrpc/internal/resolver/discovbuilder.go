@@ -4,7 +4,7 @@ import (
 	"net/url"
 	"strings"
 
-	"github.com/chenquan/zero-flow/md"
+	"github.com/chenquan/zero-flow/tag"
 	"github.com/chenquan/zero-flow/zrpc/internal/targets"
 	"github.com/zeromicro/go-zero/core/discov"
 	"github.com/zeromicro/go-zero/core/logx"
@@ -70,7 +70,8 @@ func parserAddr(sub *discov.Subscriber) ([]resolver.Address, error) {
 			continue
 		}
 
-		attr := md.NewAttributes(u.Query())
+		t := u.Query().Get("tag")
+		attr := tag.NewAttributes(t)
 		addr := u.Host
 
 		addrs = append(addrs, resolver.Address{

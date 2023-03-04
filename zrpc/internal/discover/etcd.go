@@ -2,7 +2,6 @@ package discover
 
 import (
 	"fmt"
-	"net/url"
 	"os"
 	"strings"
 
@@ -19,11 +18,11 @@ const (
 
 type EtcdConf struct {
 	discov.EtcdConf
-	Metadata string
+	Tag string
 }
 
-func (c EtcdConf) HasMetadata() bool {
-	return c.Metadata != ""
+func (c EtcdConf) HasTag() bool {
+	return c.Tag != ""
 }
 
 func RegisterRpc(conf EtcdConf, ListenOn string) error {
@@ -35,17 +34,15 @@ func RegisterRpc(conf EtcdConf, ListenOn string) error {
 		pubOpts = append(pubOpts, discov.WithPubEtcdTLS(conf.CertFile, conf.CertKeyFile,
 			conf.CACertFile, conf.InsecureSkipVerify))
 	}
-	var metadata url.Values
-	if conf.HasMetadata() {
-		var err error
-		metadata, err = url.ParseQuery(conf.Metadata)
-		if err != nil {
-			return err
-		}
+
+	var value string
+	pubListenOn := figureOutListenOn(ListenOn)
+	if conf.HasTag() {
+		value = fmt.Sprintf("%s?tag=%s", pubListenOn, conf.Tag)
+	} else {
+		value = pubListenOn
 	}
 
-	pubListenOn := figureOutListenOn(ListenOn)
-	value := fmt.Sprintf("%s?%s", pubListenOn, metadata.Encode())
 	pubClient := discov.NewPublisher(conf.Hosts, conf.Key, value, pubOpts...)
 	proc.AddShutdownListener(func() {
 		pubClient.Stop()
