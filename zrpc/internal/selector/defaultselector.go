@@ -27,12 +27,14 @@ func (d defaultSelector) Select(conns []Conn, info balancer.PickInfo) []Conn {
 		}
 	}
 
-	if len(newConns) != 0 {
-		logx.WithContext(info.Ctx).Debugw("flow staining...", logx.Field(tag.Key, tagString))
-
-		spanCtx := trace.SpanFromContext(info.Ctx)
-		spanCtx.SetAttributes(tagAttributeKey.String(tagString))
+	if len(newConns) == 0 {
+		return d.getNoTagConns(conns)
 	}
+
+	logx.WithContext(info.Ctx).Debugw("flow staining...", logx.Field(tag.Key, tagString))
+
+	spanCtx := trace.SpanFromContext(info.Ctx)
+	spanCtx.SetAttributes(tagAttributeKey.String(tagString))
 
 	return newConns
 }
