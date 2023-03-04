@@ -4,7 +4,7 @@ import (
 	"net/url"
 	"strings"
 
-	"github.com/chenquan/zero-flow/tag"
+	"github.com/chenquan/zero-flow/internal/tag"
 	"github.com/chenquan/zero-flow/zrpc/internal/targets"
 	"github.com/zeromicro/go-zero/core/discov"
 	"github.com/zeromicro/go-zero/core/logx"

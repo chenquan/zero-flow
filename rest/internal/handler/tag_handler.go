@@ -4,7 +4,7 @@ import (
 	"context"
 	"net/http"
 
-	"github.com/chenquan/zero-flow/tag"
+	"github.com/chenquan/zero-flow/internal/tag"
 	"github.com/zeromicro/go-zero/core/logx"
 	"go.opentelemetry.io/otel/attribute"
 	"go.opentelemetry.io/otel/trace"
@@ -28,7 +28,7 @@ func newBaggage(ctx context.Context, request *http.Request, tagHeader string) co
 	if len(tagString) == 0 {
 		return ctx
 	}
-	logx.WithContext(ctx).Debugw("flow staining...", logx.Field("tag", tagString))
+	logx.WithContext(ctx).Debugw("flow staining...", logx.Field(tag.Key, tagString))
 
 	ctx = tag.ContextWithTag(ctx, tagString)
 	span.SetAttributes(httpColorAttributeKey.String(tagString))
