@@ -37,7 +37,8 @@ func (d defaultSelector) Select(conns []Conn, info balancer.PickInfo) []Conn {
 	if len(newConns) != 0 {
 		spanCtx := trace.SpanFromContext(info.Ctx)
 		spanCtx.SetAttributes(colorAttributeKey.String(tagString))
-		logx.WithContext(info.Ctx).Debugw("flow dyeing", logx.Field(tagKey, tagString))
+
+		logx.WithContext(info.Ctx).Debugw("flow staining...", logx.Field("tag", tagString))
 	}
 
 	return newConns

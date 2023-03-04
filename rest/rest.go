@@ -16,6 +16,6 @@ type (
 
 func MustNewServer(c RestConf, opts ...RunOption) *Server {
 	server := rest.MustNewServer(c.RestConf, opts...)
-	server.Use(rest.ToMiddleware(handler.ColorHandler(c.HeaderTag)))
+	server.Use(rest.ToMiddleware(handler.TagHandler(c.HeaderTag)))
 	return server
 }
