@@ -16,10 +16,10 @@ go get github.com/chenquan/zero-flow
 Name: user
 Host: 0.0.0.0
 Port: 8888
+HeaderTag: X-Zero-Flow-Tag
 
 UserRpc:
   Target: etcd-flow://127.0.0.1:2379/user.rpc
-  Metadata: color=dev&version=v1.0
 Log:
   Level: debug
 ```
@@ -84,14 +84,13 @@ Etcd:
   Hosts:
     - 127.0.0.1:2379
   Key: user.rpc
-Metadata: color=c
+Tag: v1
 Log:
   Level: debug
 
 
 BookRpc:
   Target: etcd-flow://127.0.0.1:2379/book.rpc
-  Metadata: color=dev&version=v1.0
 ```
 
 *config.go*
