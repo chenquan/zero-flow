@@ -10,7 +10,7 @@ type (
 	Server    = rest.Server
 	RestConf  struct {
 		rest.RestConf
-		HeaderTag string `json:",optional,default=X-Zero-Flow-Tag"`
+		HeaderTag string `json:",optional"`
 	}
 )
 
