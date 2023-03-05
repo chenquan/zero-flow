@@ -29,7 +29,10 @@ Port: 8888
 HeaderTag: X-Zero-Flow-Tag
 
 UserRpc:
-  Target: etcd-flow://127.0.0.1:2379/user.rpc
+  Etcd:
+    Hosts:
+      - 127.0.0.1:2379
+    Key: user.rpc
 Log:
   Level: debug
 ```
@@ -97,10 +100,6 @@ Etcd:
 Tag: v1
 Log:
   Level: debug
-
-
-BookRpc:
-  Target: etcd-flow://127.0.0.1:2379/book.rpc
 ```
 
 *config.go*
@@ -115,7 +114,6 @@ import (
 type Config struct {
 	zrpc.RpcServerConf
 }
-
 ```
 
 ```go
