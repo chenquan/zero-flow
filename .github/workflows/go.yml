@@ -22,10 +22,6 @@ jobs:
           cache: true
         id: go
 
-      - name: Install deps
-        run: |
-          ./.github/script/install_deps.sh
-
       - name: Get dependencies
         run: |
           go get -v -t -d ./...
