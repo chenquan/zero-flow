@@ -10,7 +10,7 @@
 
 > Implement flow staining in go-zero.
 
-![zero-flow.jpeg](images%2Fzero-flow.jpeg)
+![zero-flow.jpeg](images/zero-flow.png)
 
 ## install
 
