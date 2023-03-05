@@ -5,7 +5,7 @@ import (
 
 	"github.com/chenquan/zero-flow/zrpc/internal/discover"
 	"github.com/chenquan/zero-flow/zrpc/internal/p2c"
-	_ "github.com/chenquan/zero-flow/zrpc/internal/resolver"
+	"github.com/chenquan/zero-flow/zrpc/internal/resolver"
 	"github.com/zeromicro/go-zero/core/discov"
 	"github.com/zeromicro/go-zero/zrpc"
 	"google.golang.org/grpc"
@@ -23,6 +23,10 @@ type (
 		Tag string `json:",optional,env=ZERO_FLOW_TAG"`
 	}
 )
+
+func init() {
+	resolver.Register()
+}
 
 func MustNewClient(c RpcClientConf, options ...ClientOption) Client {
 	svcCfg := fmt.Sprintf(`{"loadBalancingPolicy":"%s"}`, p2c.Name)

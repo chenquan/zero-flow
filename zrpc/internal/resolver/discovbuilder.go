@@ -1,4 +1,4 @@
-package internal
+package resolver
 
 import (
 	"net/url"
@@ -12,12 +12,11 @@ import (
 )
 
 const (
-	slashSeparator  = "/"
 	EndpointSepChar = ','
 	subsetSize      = 32
 )
 
-func init() {
+func Register() {
 	resolver.Register(&etcdFlowBuilder{})
 }
 
@@ -58,7 +57,7 @@ func (b *etcdFlowBuilder) Build(target resolver.Target, cc resolver.ClientConn, 
 }
 
 func (b *etcdFlowBuilder) Scheme() string {
-	return "etcd-flow"
+	return "etcd"
 }
 
 func parserAddr(sub *discov.Subscriber) ([]resolver.Address, error) {
