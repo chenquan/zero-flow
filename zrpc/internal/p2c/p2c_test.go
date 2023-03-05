@@ -8,6 +8,7 @@ import (
 	"sync"
 	"testing"
 
+	"github.com/chenquan/zero-flow/internal/tag"
 	"github.com/stretchr/testify/assert"
 	"github.com/zeromicro/go-zero/core/logx"
 	"github.com/zeromicro/go-zero/core/mathx"
@@ -39,6 +40,8 @@ func TestP2cPicker_Pick(t *testing.T) {
 		candidates int
 		err        error
 		threshold  float64
+		connTag    string
+		tag        string
 	}{
 		{
 			name:       "empty",
@@ -60,6 +63,20 @@ func TestP2cPicker_Pick(t *testing.T) {
 			candidates: 100,
 			threshold:  0.95,
 		},
+		{
+			name:       "multiple",
+			candidates: 100,
+			threshold:  0.95,
+			connTag:    "v1",
+			tag:        "v1",
+		},
+		{
+			name:       "multiple",
+			candidates: 100,
+			threshold:  0.95,
+			//connTag:    "v1",
+			tag: "v1",
+		},
 	}
 
 	for _, test := range tests {
@@ -75,7 +92,8 @@ func TestP2cPicker_Pick(t *testing.T) {
 					id: stringx.Rand(),
 				}] = base.SubConnInfo{
 					Address: resolver.Address{
-						Addr: strconv.Itoa(i),
+						Addr:               strconv.Itoa(i),
+						BalancerAttributes: tag.NewAttributes(test.connTag),
 					},
 				}
 			}
@@ -86,9 +104,10 @@ func TestP2cPicker_Pick(t *testing.T) {
 			var wg sync.WaitGroup
 			wg.Add(total)
 			for i := 0; i < total; i++ {
+				ctx := tag.ContextWithTag(context.Background(), test.tag)
 				result, err := picker.Pick(balancer.PickInfo{
 					FullMethodName: "/",
-					Ctx:            context.Background(),
+					Ctx:            ctx,
 				})
 				assert.Equal(t, test.err, err)
 
