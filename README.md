@@ -1,5 +1,12 @@
 # zero-flow
 
+[![Go](https://github.com/chenquan/zero-flow/actions/workflows/go.yml/badge.svg)](https://github.com/chenquan/zero-flow/actions/workflows/go.yml)
+[![CodeQL](https://github.com/chenquan/zero-flow/actions/workflows/codeql-analysis.yml/badge.svg)](https://github.com/chenquan/zero-flow/actions/workflows/codeql-analysis.yml)
+
+[![Release](https://img.shields.io/github/v/release/chenquan/zero-flow.svg?style=flat-square)](https://github.com/chenquan/zero-flow)
+[![Download](https://goproxy.cn/stats/github.com/chenquan/zero-flow/badges/download-count.svg)](https://github.com/chenquan/zero-flow)
+[![GitHub](https://img.shields.io/github/license/chenquan/zero-flow)](LICENSE)
+
 > Implement flow staining in go-zero.
 
 ![zero-flow.jpeg](images%2Fzero-flow.jpeg)
@@ -149,3 +156,5 @@ func main() {
 }
 
 ```
+
+<a href="https://www.buymeacoffee.com/chenquan"><img src="https://img.buymeacoffee.com/button-api/?text=Buy me a coffee&emoji=&slug=chenquan&button_colour=FFDD00&font_colour=000000&font_family=Poppins&outline_colour=000000&coffee_colour=ffffff" /></a>
