@@ -28,12 +28,7 @@ func (b *etcdFlowBuilder) Build(target resolver.Target, cc resolver.ClientConn, 
 		return r == EndpointSepChar
 	})
 
-	user := target.URL.User
-	password, _ := user.Password()
-	username := user.Username()
-	sub, err := discov.NewSubscriber(hosts, targets.GetEndpoints(target),
-		discov.WithSubEtcdAccount(username, password),
-	)
+	sub, err := discov.NewSubscriber(hosts, targets.GetEndpoints(target))
 	if err != nil {
 		return nil, err
 	}
