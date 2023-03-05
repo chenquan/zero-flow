@@ -2,6 +2,7 @@
 
 [![Go](https://github.com/chenquan/zero-flow/actions/workflows/go.yml/badge.svg)](https://github.com/chenquan/zero-flow/actions/workflows/go.yml)
 [![CodeQL](https://github.com/chenquan/zero-flow/actions/workflows/codeql-analysis.yml/badge.svg)](https://github.com/chenquan/zero-flow/actions/workflows/codeql-analysis.yml)
+[![codecov](https://codecov.io/gh/chenquan/zero-flow/branch/master/graph/badge.svg)](https://codecov.io/gh/chenquan/zero-flow)
 
 [![Release](https://img.shields.io/github/v/release/chenquan/zero-flow.svg?style=flat-square)](https://github.com/chenquan/zero-flow)
 [![Download](https://goproxy.cn/stats/github.com/chenquan/zero-flow/badges/download-count.svg)](https://github.com/chenquan/zero-flow)
