@@ -10,7 +10,7 @@
 
 > Implement flow staining in go-zero.
 
-![zero-flow.jpeg](images/zero-flow.png)
+![zero-flow.jpeg](./images/zero-flow.png)
 
 ## install
 
@@ -97,7 +97,7 @@ Etcd:
   Hosts:
     - 127.0.0.1:2379
   Key: user.rpc
-Tag: v1
+Tag: red # 定义流量标签，相同流量标签的不同服务在一个调用链路中将构成一个泳道。
 Log:
   Level: debug
 ```
