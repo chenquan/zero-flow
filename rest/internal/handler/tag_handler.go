@@ -10,7 +10,7 @@ import (
 	"go.opentelemetry.io/otel/trace"
 )
 
-var httpColorAttributeKey = attribute.Key("http.header.color")
+var httpTagAttributeKey = attribute.Key("http.header.flow.tag")
 
 func TagHandler(tagHeader string) func(next http.Handler) http.Handler {
 	return func(next http.Handler) http.Handler {
@@ -28,10 +28,11 @@ func newBaggage(ctx context.Context, request *http.Request, tagHeader string) co
 	if len(tagString) == 0 {
 		return ctx
 	}
+
 	logx.WithContext(ctx).Debugw("flow staining...", logx.Field(tag.Key, tagString))
 
 	ctx = tag.ContextWithTag(ctx, tagString)
-	span.SetAttributes(httpColorAttributeKey.String(tagString))
+	span.SetAttributes(httpTagAttributeKey.String(tagString))
 
 	return ctx
 }
