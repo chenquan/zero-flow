@@ -3,7 +3,7 @@ module github.com/chenquan/zero-flow
 go 1.18
 
 require (
-	github.com/stretchr/testify v1.8.3
+	github.com/stretchr/testify v1.8.4
 	github.com/zeromicro/go-zero v1.5.2
 	go.opentelemetry.io/otel v1.14.0
 	go.opentelemetry.io/otel/trace v1.14.0
