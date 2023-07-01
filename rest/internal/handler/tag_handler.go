@@ -23,15 +23,15 @@ func TagHandler(tagHeader string) func(next http.Handler) http.Handler {
 }
 
 func newBaggage(ctx context.Context, request *http.Request, tagHeader string) context.Context {
-	span := trace.SpanFromContext(ctx)
 	tagString := request.Header.Get(tagHeader)
 	if len(tagString) == 0 {
 		return ctx
 	}
+	ctx = tag.ContextWithTag(ctx, tagString)
 
 	logx.WithContext(ctx).Debugw("flow staining...", logx.Field(tag.Key, tagString))
 
-	ctx = tag.ContextWithTag(ctx, tagString)
+	span := trace.SpanFromContext(ctx)
 	span.SetAttributes(httpTagAttributeKey.String(tagString))
 
 	return ctx
