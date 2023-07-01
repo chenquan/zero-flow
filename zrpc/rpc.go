@@ -30,8 +30,8 @@ func init() {
 
 func MustNewClient(c RpcClientConf, options ...ClientOption) Client {
 	svcCfg := fmt.Sprintf(`{"loadBalancingPolicy":"%s"}`, p2c.Name)
-	options = append(options,
-		zrpc.WithDialOption(grpc.WithDefaultServiceConfig(svcCfg)),
+	options = append([]ClientOption{zrpc.WithDialOption(grpc.WithDefaultServiceConfig(svcCfg))},
+		options...,
 	)
 	return zrpc.MustNewClient(c.RpcClientConf, options...)
 }
