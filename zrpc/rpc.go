@@ -37,14 +37,18 @@ func MustNewClient(c RpcClientConf, options ...ClientOption) Client {
 }
 
 func MustNewServer(c RpcServerConf, register func(*grpc.Server)) *RpcServer {
+	hasEtcd := c.HasEtcd()
+
 	etcdConf := c.Etcd
 	c.Etcd = discov.EtcdConf{}
 	server := zrpc.MustNewServer(c.RpcServerConf, func(server *grpc.Server) {
 		register(server)
-		discover.MustRegisterRpc(discover.EtcdConf{
-			EtcdConf: etcdConf,
-			Tag:      c.Tag,
-		}, c.RpcServerConf.ListenOn)
+		if hasEtcd {
+			discover.MustRegisterRpc(discover.EtcdConf{
+				EtcdConf: etcdConf,
+				Tag:      c.Tag,
+			}, c.RpcServerConf.ListenOn)
+		}
 	})
 
 	return server
