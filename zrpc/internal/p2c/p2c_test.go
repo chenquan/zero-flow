@@ -152,8 +152,6 @@ func (m mockClientConn) GetOrBuildProducer(_ balancer.ProducerBuilder) (p balanc
 	panic("implement me")
 }
 
-func (m mockClientConn) UpdateAddresses(_ []resolver.Address) {
-}
-
-func (m mockClientConn) Connect() {
-}
+func (m mockClientConn) Shutdown()                            {}
+func (m mockClientConn) UpdateAddresses(_ []resolver.Address) {}
+func (m mockClientConn) Connect()                             {}
