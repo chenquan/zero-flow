@@ -7,7 +7,7 @@ require (
 	github.com/zeromicro/go-zero v1.6.2
 	go.opentelemetry.io/otel v1.19.0
 	go.opentelemetry.io/otel/trace v1.19.0
-	google.golang.org/grpc v1.61.0
+	google.golang.org/grpc v1.61.1
 )
 
 require (
